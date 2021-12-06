@@ -5,6 +5,7 @@ SetWorkingDir, %A_ScriptDir%
 Gui, New , Resize , PoeUtil
 
 InitConfig(){
+    
     if (FileExist(A_ScriptDir . "/config.ini")){
         AlwaysOnTopFlag := ConfigGet("AlwaysOnTopFlag")
         if(AlwaysOnTopFlag = 1){

@@ -3,6 +3,7 @@ SendMode Input
 SetWorkingDir, %A_ScriptDir%
 
 genMatchStr(Name1,Name2,Name3,Name4,Min){
+    
     strList := []
     strListLength := 0
     if(StrLen(Trim(Name1))>0){
@@ -49,18 +50,42 @@ DoSave(sectionName){
     GuiControlGet, Name2
     GuiControlGet, Name3
     GuiControlGet, Name4
+    GuiControlGet, TuiBian
+    GuiControlGet, GaiZao
+    GuiControlGet, ZengFu
+    GuiControlGet, FuHao
+    GuiControlGet, ChongZhu
+    GuiControlGet, DianJin
+    GuiControlGet, HunDun
+    GuiControlGet, ChongGao
     ConfigSet("Min",Min,sectionName)
     ConfigSet("Name1",Name1,sectionName)
     ConfigSet("Name2",Name2,sectionName)
     ConfigSet("Name3",Name3,sectionName)
     ConfigSet("Name4",Name4,sectionName)
+    ConfigSet("TuiBian",TuiBian,sectionName)
+    ConfigSet("GaiZao",GaiZao,sectionName)
+    ConfigSet("ZengFu",ZengFu,sectionName)
+    ConfigSet("FuHao",FuHao,sectionName)
+    ConfigSet("ChongZhu",ChongZhu,sectionName)
+    ConfigSet("DianJin",DianJin,sectionName)
+    ConfigSet("HunDun",HunDun,sectionName)
+    ConfigSet("ChongGao",ChongGao,sectionName)
 }
 
-LoadData(RowText){
-    GuiControl,, TopCheckBox , ("Min",RowText)
-    GuiControl,, TopCheckBox , ("Name1",RowText)
-    GuiControl,, TopCheckBox , ("Name2",RowText)
-    GuiControl,, TopCheckBox , ("Name3",RowText)
-    GuiControl,, TopCheckBox , ("Name4",RowText)
+LoadData(RowText,DefaultGui){
+    GuiControl,, Min , % ConfigGet("Min",RowText)
+    GuiControl,, Name1 , % ConfigGet("Name1",RowText)
+    GuiControl,, Name2 , % ConfigGet("Name2",RowText)
+    GuiControl,, Name3 , % ConfigGet("Name3",RowText)
+    GuiControl,, Name4 , % ConfigGet("Name4",RowText)
+    GuiControl,, TuiBian , % ConfigGet("TuiBian",RowText)
+    GuiControl,, GaiZao , % ConfigGet("GaiZao",RowText)
+    GuiControl,, ZengFu , % ConfigGet("ZengFu",RowText)
+    GuiControl,, FuHao , % ConfigGet("FuHao",RowText)
+    GuiControl,, ChongZhu , % ConfigGet("ChongZhu",RowText)
+    GuiControl,, DianJin , % ConfigGet("DianJin",RowText)
+    GuiControl,, HunDun , % ConfigGet("HunDun",RowText)
+    GuiControl,, ChongGao , % ConfigGet("ChongGao",RowText)
 }
 

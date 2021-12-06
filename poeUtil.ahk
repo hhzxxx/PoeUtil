@@ -2,6 +2,9 @@
 SendMode Input
 SetWorkingDir, %A_ScriptDir%
 
+global DefaultGui := ""
+global NowSection := ""
+
 #include %A_ScriptDir%\init.ahk
 #include %A_ScriptDir%\work.ahk
 
@@ -41,6 +44,7 @@ Gui, Add, Button, Default w80 x+ , Reload
 
 InitConfig()
 Gui, Show,AutoSize
+DefaultGui = %A_DefaultGui%
 return
 
 ButtonOK:
@@ -51,7 +55,7 @@ return
 ButtonSave:
 Gui, Submit,NoHide
 Gui +OwnDialogs
-InputBox, UserInput, 保存, 输入配置名, , 120, 120
+InputBox, UserInput, 保存, 输入配置名, , 120, 120,,,,,%NowSection%
 if not ErrorLevel
     if(StrLen(Trim(UserInput))>0){
         sectionName := Trim(UserInput)
@@ -90,12 +94,16 @@ LV_ModifyCol(6,60)  ; 根据内容自动调整每列的大小.
 Gui, MyGui:Show
 return
 
+
+
 MyListView:
 if (A_GuiEvent = "DoubleClick")
 {
     LV_GetText(RowText, A_EventInfo)  ; 从行的第一个字段中获取文本.
     Gui, MyGui:Destroy
-    LoadData(RowText)
+    Gui, %DefaultGui%:Default
+    NowSection = %RowText%
+    LoadData(RowText,DefaultGui)
 }
 return
 
@@ -118,7 +126,8 @@ ButtonReload:
 Reload
 return
 
-
+GuiClose:
+ExitApp
 
 
 
