@@ -1,4 +1,4 @@
-#SingleInstance
+﻿#SingleInstance
 SendMode Input
 SetWorkingDir, %A_ScriptDir%
 #Persistent
@@ -18,19 +18,52 @@ global needfix := 0
 global gotPrefix := 0
 global gotSuffix := 0
 global gotNeedfix := 0
+global nowPrefix := 0
+global nowSuffix := 0
 global addNum := 0  ;富豪 增幅数量
 global allowChongZhu := 0
 
 StartWork(){
+  global itemList := []
+  global matchStrList := []
+  global fixTypeList := []
+  global readyFlag := 0
+  global fixMin := 0
+  global oldMatch := 0
+  global anyfix := 0
+  global prefix := 0
+  global suffix := 0
+  global needfix := 0
+  global gotPrefix := 0
+  global gotSuffix := 0
+  global gotNeedfix := 0
+  global nowPrefix := 0
+  global nowSuffix := 0
+  global addNum := 0  ;富豪 增幅数量
+  global allowChongZhu := 0
   genItemList()
-  ; SetTimer, TimerWork, Off
-  ; SetTimer, TimerWork, 300
   return
 }
 
 Use(type){
-  if((fixMin - oldMatch)> addNum and type = 6){
-    return 0
+  if(CheckImg(type) = 0){
+    return "nonono"
+  }
+  if(  type = 6){
+    if(nowSuffix = 1 and nowPrefix = 1){
+      return 0
+    }
+    if(nowPrefix = 0 and nowSuffix = 1 and (prefix>0 or anyfix>0)){
+      a = 1
+    }else if(nowSuffix = 0 and nowPrefix = 1 and (suffix>0 or anyfix>0)){
+      a = 2
+    }else if(nowPrefix = 0 and nowSuffix = 1 and suffix>0 and anyfix=0){
+      return 0
+    }else if(nowSuffix = 0 and nowPrefix = 1 and prefix>0 and anyfix=0){
+      return 0
+    }else if((fixMin - oldMatch)> addNum or (nowSuffix = 1 and nowPrefix = 1)){
+      return 0
+    }
   }
   if(oldMatch != (fixMin-1) and type = 7){
     return 0
@@ -176,7 +209,7 @@ match(){
   MouseMove, %itemX%,%itemY% 
   Sleep, 30
   send ^!C
-  Sleep, 20
+  Sleep, 30
   Haystack:= Clipboard
   matchCount := 0
   matchRes :=""
@@ -184,6 +217,14 @@ match(){
   global gotSuffix := 0
   global gotNeedfix := 0
   global oldMatch := 0
+  global nowPrefix := 0
+  global nowSuffix := 0
+  if(InStr(Clipboard, "前缀") or InStr(Clipboard, "prefix")){
+    nowPrefix += 1
+  }
+  if(InStr(Clipboard, "后缀") or InStr(Clipboard, "suffix")){
+    nowSuffix += 1
+  }
   For index, value in matchStrList
   {    
     if(InStr(Haystack, value)){
@@ -191,6 +232,7 @@ match(){
       matchCount += 1
       matchRes = %matchRes% %value%
     }
+
   }
   
   ; ToolTip,% gotPrefix " " gotSuffix " " oldMatch " " Haystack

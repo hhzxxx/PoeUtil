@@ -149,13 +149,15 @@ SavePos(xpos,ypos,type){
 }
 
 CheckImg(type){
+  return 1
   WinActivate, Path of Exile
+  MouseMove, % LTopX, % LTopY
   src := % A_ScriptDir "\pic\" type ".png"
   ImageSearch, FoundX, FoundY, % LTopX, % LTopY, % RBottomX, % RBottomY,%src%
   if (ErrorLevel = 2)
-    MsgBox Could not conduct the search.
+    return 0
   else if (ErrorLevel = 1)
-    MsgBox Icon could not be found on the screen.
+    return 0
   else
-    SavePos(FoundX,FoundY,type)
+    return 1
 }
