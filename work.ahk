@@ -9,6 +9,14 @@ DoSave(sectionName){
   GuiControlGet, Name2
   GuiControlGet, Name3
   GuiControlGet, Name4
+  GuiControlGet, Name5
+  GuiControlGet, Name6
+  GuiControlGet, Name1Type
+  GuiControlGet, Name2Type
+  GuiControlGet, Name3Type
+  GuiControlGet, Name4Type
+  GuiControlGet, Name5Type
+  GuiControlGet, Name6Type
   GuiControlGet, TuiBian
   GuiControlGet, GaiZao
   GuiControlGet, ZengFu
@@ -22,6 +30,14 @@ DoSave(sectionName){
   ConfigSet("Name2",Name2,sectionName)
   ConfigSet("Name3",Name3,sectionName)
   ConfigSet("Name4",Name4,sectionName)
+  ConfigSet("Name5",Name5,sectionName)
+  ConfigSet("Name6",Name6,sectionName)
+  ConfigSet("Name1Type",Name1Type,sectionName)
+  ConfigSet("Name2Type",Name2Type,sectionName)
+  ConfigSet("Name3Type",Name3Type,sectionName)
+  ConfigSet("Name4Type",Name4Type,sectionName)
+  ConfigSet("Name5Type",Name5Type,sectionName)
+  ConfigSet("Name6Type",Name6Type,sectionName)
   ConfigSet("TuiBian",TuiBian,sectionName)
   ConfigSet("GaiZao",GaiZao,sectionName)
   ConfigSet("ZengFu",ZengFu,sectionName)
@@ -42,6 +58,14 @@ LoadData(RowText,DefaultGui){
   GuiControl,, Name2 , % ConfigGet("Name2",RowText)
   GuiControl,, Name3 , % ConfigGet("Name3",RowText)
   GuiControl,, Name4 , % ConfigGet("Name4",RowText)
+  GuiControl,, Name5 , % ConfigGet("Name5",RowText)
+  GuiControl,, Name6 , % ConfigGet("Name6",RowText)
+  GuiControl,Choose, Name1Type , % ConfigGet("Name1Type",RowText)=0?1:ConfigGet("Name1Type",RowText)
+  GuiControl,Choose, Name2Type , % ConfigGet("Name2Type",RowText)=0?1:ConfigGet("Name2Type",RowText)
+  GuiControl,Choose, Name3Type , % ConfigGet("Name3Type",RowText)=0?1:ConfigGet("Name3Type",RowText)
+  GuiControl,Choose, Name4Type , % ConfigGet("Name4Type",RowText)=0?1:ConfigGet("Name4Type",RowText)
+  GuiControl,Choose, Name5Type , % ConfigGet("Name5Type",RowText)=0?1:ConfigGet("Name5Type",RowText)
+  GuiControl,Choose, Name6Type , % ConfigGet("Name6Type",RowText)=0?1:ConfigGet("Name6Type",RowText)
   GuiControl,, TuiBian , % ConfigGet("TuiBian",RowText)
   GuiControl,, GaiZao , % ConfigGet("GaiZao",RowText)
   GuiControl,, ZengFu , % ConfigGet("ZengFu",RowText)
@@ -56,11 +80,11 @@ ImgSearch(type){
   WinActivate, Path of Exile
   Sleep, 300
   src := % A_ScriptDir "\pic\" type ".png"
-  ImageSearch, FoundX, FoundY, % ConfigGet("LTopX"), % ConfigGet("LTopY"), % ConfigGet("RBottomX"), % ConfigGet("RBottomY"),%src%
+  ImageSearch, FoundX, FoundY, % LTopX, % LTopY, % RBottomX, % RBottomY,%src%
   if (ErrorLevel = 2)
-    MsgBox Could not conduct the search.
+    MsgBox 图片不存在
   else if (ErrorLevel = 1)
-    MsgBox Icon could not be found on the screen.
+    MsgBox 没有找到
   else
     SavePos(FoundX,FoundY,type)
 }
@@ -70,12 +94,15 @@ SavePos(xpos,ypos,type){
   if(type = 1){ ;左上坐标
     ConfigSet("LTopX",xpos)
     ConfigSet("LTopY",ypos)
+    global LTopX = % xpos
+    global LTopY = % ypos
     GuiControl,, LeftTopXY , % xpos " " ypos
-
   }
   if(type = 2){ ;右下坐标
     ConfigSet("RBottomX",xpos)
     ConfigSet("RBottomY",ypos)
+    global RBottomX = % xpos
+    global RBottomY = % ypos
     GuiControl,, RightBottomXY , % xpos " " ypos
   }
   if(type = 3){ ;点金
@@ -121,6 +148,14 @@ SavePos(xpos,ypos,type){
   WinActivate,PoeUtil
 }
 
-; RemoveToolTip:
-; ToolTip
-; return
+CheckImg(type){
+  WinActivate, Path of Exile
+  src := % A_ScriptDir "\pic\" type ".png"
+  ImageSearch, FoundX, FoundY, % LTopX, % LTopY, % RBottomX, % RBottomY,%src%
+  if (ErrorLevel = 2)
+    MsgBox Could not conduct the search.
+  else if (ErrorLevel = 1)
+    MsgBox Icon could not be found on the screen.
+  else
+    SavePos(FoundX,FoundY,type)
+}

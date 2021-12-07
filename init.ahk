@@ -3,7 +3,12 @@ SendMode Input
 SetWorkingDir, %A_ScriptDir%
 #Persistent
 
-Gui, New , Resize , PoeUtil
+global LTopX = 0
+global LTopY = 0
+global RBottomX = 0
+global RBottomY = 0
+
+Gui, New ,  , PoeUtil
 gui, font, s10, Verdana
 InitConfig(){
   if (FileExist(A_ScriptDir . "/config.ini")){
@@ -17,9 +22,13 @@ InitConfig(){
     }
 
     if(ConfigGet("LTopX") and ConfigGet("LTopY")){
+      global LTopX = % ConfigGet("LTopX")
+      global LTopY = % ConfigGet("LTopY")
       GuiControl,, LeftTopXY , % ConfigGet("LTopX") " " ConfigGet("LTopY")
     }
     if(ConfigGet("RBottomX") and ConfigGet("RBottomY")){
+      global RBottomX = % ConfigGet("RBottomX")
+      global RBottomY = % ConfigGet("RBottomY")
       GuiControl,, RightBottomXY , % ConfigGet("RBottomX") " " ConfigGet("RBottomY")
     }
     if(ConfigGet("DianJinX") and ConfigGet("DianJinY")){

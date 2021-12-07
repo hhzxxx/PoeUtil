@@ -31,10 +31,19 @@ Gui, Add, UpDown, vMin Range1-4 , 1
 Gui, Add, Button, Default w40 x+20 , Save
 Gui, Add, Button, Default w40 x+20 , Load
 
-Gui, Add, Edit, vName1 w240 Limit50 xs+10 y+10, 
-Gui, Add, Edit, vName2 w240 Limit50 xs+10 y+10, 
-Gui, Add, Edit, vName3 w240 Limit50 xs+10 y+10, 
-Gui, Add, Edit, vName4 w240 Limit50 xs+10 y+10, 
+Gui, Add, Edit, vName1 w180 Limit50 xs+10 y+10, 
+Gui, Add, Edit, vName2 w180 Limit50 xs+10 y+6, 
+Gui, Add, Edit, vName3 w180 Limit50 xs+10 y+6, 
+Gui, Add, Edit, vName4 w180 Limit50 xs+10 y+6, 
+Gui, Add, Edit, vName5 w180 Limit50 xs+10 y+6, 
+Gui, Add, Edit, vName6 w180 Limit50 xs+10 y+6, 
+
+Gui, Add, DropDownList, vName1Type w55 ys+120 x+5 AltSubmit, 任意||前缀|后缀|必须
+Gui, Add, DropDownList, vName2Type w55 y+10 AltSubmit, 任意||前缀|后缀|必须
+Gui, Add, DropDownList, vName3Type w55 y+10 AltSubmit, 任意||前缀|后缀|必须
+Gui, Add, DropDownList, vName4Type w55 y+10 AltSubmit, 任意||前缀|后缀|必须
+Gui, Add, DropDownList, vName5Type w55 y+10 AltSubmit, 任意||前缀|后缀|必须
+Gui, Add, DropDownList, vName6Type w55 y+10 AltSubmit, 任意||前缀|后缀|必须
 
 Gui, Tab, 2 
 Gui, Add, CheckBox, vTopCheckBox gTopCheck , 置顶
@@ -61,13 +70,15 @@ Gui, Add, Edit, vChongZhuXY w60 y+10 +ReadOnly
 Gui, Add, Edit, vJiHuiXY w60 y+10 +ReadOnly 
 Gui, Tab, 
 Gui, Add, Button, Default w80 , OK 
-Gui, Add, Button, Default w80 x+ , Reload
+Gui, Add, Button, Default w80 x+100 , Reload
+Gui, Add, StatusBar,, 没有加载配置.
 
-; Gui, Add, StatusBar,, Bar's starting text (omit to start off empty).
-; SB_SetText("没有加载 " . RowCount . " rows selected.")
 
 InitConfig()
-Gui, Show,AutoSize
+WinGetPos, X, Y, W, H, ahk_exe Explorer.EXE
+xx := % Ceil(W/5)*3
+xx = x%xx%
+Gui, Show,AutoSize yCenter %xx%
 DefaultGui = %A_DefaultGui%
 return
 
@@ -76,7 +87,6 @@ ButtonOK:
   StartWork()
   SetTimer, TimerWork, Off
   SetTimer, TimerWork, 20
-  ; genMatchStr(Name1,Name2,Name3,Name4,Min)
 return
 
 ButtonSave:
@@ -93,9 +103,13 @@ ButtonSave:
     if(StrLen(ConfigSectionGet(sectionName))>0){
       MsgBox, 4, , 是否覆盖 
       IfMsgBox Yes
-      DoSave(sectionName)
+      {
+        DoSave(sectionName)
+        SBSetText(sectionName)
+      }
     }else{
       DoSave(sectionName)
+      SBSetText(sectionName)
     }
   }
 return
@@ -107,14 +121,14 @@ return
 ListViewAdd(){
   Gui, MyGui:Destroy
   MouseGetPos, xpos, ypos,
-  Gui, MyGui:Add, ListView, r20 w400 gMyListView, 配置名|至少|词缀1|词缀2|词缀3|词缀4
+  Gui, MyGui:Add, ListView, r20 w400 gMyListView, 配置名|至少|词缀1|词缀2|词缀3|词缀4|词缀5|词缀6|
   Gui, MyGui:Default
   ;获取段名列表
   IniRead, OutputVarSectionNames, %A_ScriptDir%\config.ini
   Array := StrSplit(OutputVarSectionNames , "`n")
   For index, value in Array
   if(value != "Config"){
-    LV_Add("", value, ConfigGet("Min",value), ConfigGet("Name1",value), ConfigGet("Name2",value), ConfigGet("Name3",value), ConfigGet("Name4",value))
+    LV_Add("", value, ConfigGet("Min",value), ConfigGet("Name1",value), ConfigGet("Name2",value), ConfigGet("Name3",value), ConfigGet("Name4",value), ConfigGet("Name5",value), ConfigGet("Name6",value))
   }
 
   LV_ModifyCol(1,80) ; 根据内容自动调整每列的大小.
@@ -130,18 +144,25 @@ MyListView:
   if (A_GuiEvent = "DoubleClick")
   {
     LV_GetText(RowText, A_EventInfo) ; 从行的第一个字段中获取文本.
-    Gui, MyGui:Destroy
-    Gui, %DefaultGui%:Default
-    NowSection = %RowText%
-    LoadData(RowText,DefaultGui)
+    if(A_EventInfo > 0){
+      Gui, MyGui:Destroy
+      Gui, %DefaultGui%:Default
+      NowSection = %RowText%
+      SBSetText(NowSection)
+      LoadData(RowText,DefaultGui)
+    }
   }
   if (A_GuiEvent = "R")
   {
     LV_GetText(RowText, A_EventInfo) ; 从行的第一个字段中获取文本.
-    MsgBox, 4, , 确认删除 
-    IfMsgBox Yes
-    DoDelete(RowText)
-    ListViewAdd()
+    if(A_EventInfo > 0){
+      MsgBox, 4, ,% "确认删除 " RowText "?"
+      IfMsgBox Yes
+      {
+        DoDelete(RowText)
+        ListViewAdd()
+      }
+    }
   }
 
 return
@@ -258,15 +279,23 @@ ProcSubroutine:
 return
 
 TimerWork:
-  if(WinActive("Path of Exile")){
-    type := itemList.Pop()
-    itemList.InsertAt(0,type)
-    res := Use(type)
-    if(res != 0){
-      ToolTip, success
-      SetTimer, TimerWork, Off
+  if(WinExist("Path of Exile")){
+    if(WinActive("Path of Exile")){
+      type := itemList.Pop()
+      itemList.InsertAt(0,type)
+      res := Use(type)
+      if(res != 0){
+        ToolTip, success
+        SetTimer, TimerWork, Off
+      }
+    }Else{
+      WinActivate, Path of Exile
     }
-  }Else{
-    WinActivate, Path of Exile
+  }else{
+    SetTimer, TimerWork, Off
   }
 return
+
+SBSetText(text){
+  SB_SetText("    " . text . "")
+}

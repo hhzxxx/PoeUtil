@@ -7,9 +7,19 @@ global itemX := 0
 global itemY := 0
 global itemList := []
 global matchStrList := []
+global fixTypeList := []
 global readyFlag := 0
 global fixMin := 0
 global oldMatch := 0
+global anyfix := 0
+global prefix := 0
+global suffix := 0
+global needfix := 0
+global gotPrefix := 0
+global gotSuffix := 0
+global gotNeedfix := 0
+global addNum := 0  ;富豪 增幅数量
+global allowChongZhu := 0
 
 StartWork(){
   genItemList()
@@ -19,7 +29,13 @@ StartWork(){
 }
 
 Use(type){
-  if(oldMatch != 1 and type = 6){
+  if((fixMin - oldMatch)> addNum and type = 6){
+    return 0
+  }
+  if(oldMatch != (fixMin-1) and type = 7){
+    return 0
+  }
+  if(allowChongZhu = 0 and type = 9){
     return 0
   }
   initItemXy()
@@ -33,6 +49,11 @@ Use(type){
     if(WinActive("Path of Exile")){
       Click,%x% %y% Right
       Click,%itemX% %itemY% 
+      if(type = 7 or type = 10 or type = 3){
+        global allowChongZhu := 1
+      }Else{
+        global allowChongZhu := 0
+      }
       return match()
     }
   }
@@ -50,12 +71,22 @@ initItemXy(){
 }
 
 genItemList(){
-  itemList := []
+  global fixTypeList := []
+  global itemList := []
+  global addNum := 0
   GuiControlGet, Min
   GuiControlGet, Name1
   GuiControlGet, Name2
   GuiControlGet, Name3
   GuiControlGet, Name4
+  GuiControlGet, Name5
+  GuiControlGet, Name6
+  GuiControlGet, Name1Type
+  GuiControlGet, Name2Type
+  GuiControlGet, Name3Type
+  GuiControlGet, Name4Type
+  GuiControlGet, Name5Type
+  GuiControlGet, Name6Type
   GuiControlGet, TuiBian
   GuiControlGet, GaiZao
   GuiControlGet, ZengFu
@@ -69,9 +100,11 @@ genItemList(){
     itemList.Push(9)
   }
   if(FuHao = 1){
+    addNum += 1
     itemList.Push(7)
   }
   if(ZengFu = 1){
+    addNum += 1
     itemList.Push(6)
   }
   if(GaiZao = 1){
@@ -89,27 +122,43 @@ genItemList(){
   if(JiHui = 1){
     itemList.Push(10)
   }
-  genMatchStr(Name1,Name2,Name3,Name4,Min)
-}
 
-genMatchStr(Name1,Name2,Name3,Name4,Min){
-  matchStrList := []
+  global anyfix := 0
+  global prefix := 0
+  global suffix := 0
+  global needfix := 0
+
+  global matchStrList := []
   strListLength := 0
   if(StrLen(Trim(Name1))>0){
+    addFixNum(Name1Type)
     strListLength+=1
     matchStrList.Push(Trim(Name1))
   }
   if(StrLen(Trim(Name2))>0){
+    addFixNum(Name2Type)
     strListLength+=1
     matchStrList.Push(Trim(Name2))
   }
   if(StrLen(Trim(Name3))>0){
+    addFixNum(Name3Type)
     strListLength+=1
     matchStrList.Push(Trim(Name3))
   }
   if(StrLen(Trim(Name4))>0){
+    addFixNum(Name4Type)
     strListLength+=1
     matchStrList.Push(Trim(Name4))
+  }
+  if(StrLen(Trim(Name5))>0){
+    addFixNum(Name5Type)
+    strListLength+=1
+    matchStrList.Push(Trim(Name5))
+  }
+  if(StrLen(Trim(Name6))>0){
+    addFixNum(Name6Type)
+    strListLength+=1
+    matchStrList.Push(Trim(Name6))
   }
   RegList := []
   fixMin = %Min%
@@ -119,9 +168,10 @@ genMatchStr(Name1,Name2,Name3,Name4,Min){
   if(fixMin = 0){
     return 
   }
+  SBSetText("ready")
   readyFlag = 1
-  ToolTip,ready
 }
+
 match(){
   MouseMove, %itemX%,%itemY% 
   Sleep, 30
@@ -130,14 +180,51 @@ match(){
   Haystack:= Clipboard
   matchCount := 0
   matchRes :=""
+  global gotPrefix := 0
+  global gotSuffix := 0
+  global gotNeedfix := 0
+  global oldMatch := 0
   For index, value in matchStrList
-  if(InStr(Haystack, value)){
-    matchCount += 1
-    matchRes = %matchRes% %value%
+  {    
+    if(InStr(Haystack, value)){
+      addGotFixNum(fixTypeList[index])
+      matchCount += 1
+      matchRes = %matchRes% %value%
+    }
   }
-  oldMatch = %matchCount%
-  if(matchCount >= fixMin and matchCount>0){
+  
+  ; ToolTip,% gotPrefix " " gotSuffix " " oldMatch " " Haystack
+  if(matchCount >= fixMin and matchCount>0 and gotNeedfix = needfix){
     return matchRes
   }
   return 0
+}
+
+addFixNum(type){
+  fixTypeList.Push(type)
+  if(type = 0 or type = 1){
+    anyfix += 1
+  }
+  if(type = 2){
+    prefix += 1
+  }
+  if(type = 3){
+    suffix += 1
+  }
+  if(type = 4){
+    needfix += 1
+  }
+}
+
+addGotFixNum(type){
+  oldMatch += 1
+  if(type = 2){
+    gotPrefix += 1
+  }
+  if(type = 3){
+    gotSuffix += 1
+  }
+  if(type = 4){
+    gotNeedfix += 1
+  }
 }
