@@ -55,11 +55,34 @@ InitConfig(){
     if(ConfigGet("JiHuiX") and ConfigGet("JiHuiY")){
       GuiControl,, JiHuiXY , % ConfigGet("JiHuiX") " " ConfigGet("JiHuiY")
     }
-
   }Else{
     FileAppend,, %A_ScriptDir%\config.ini,UTF-8
     ConfigSet("AlwaysOnTopFlag",0)
   }
+  checkImgFile()
+  ; https://gitee.com/hhzxxx/static4-me/raw/master/pic/poeUtil/3.png
+}
+
+checkImgFile(){
+  picSrc :=% A_ScriptDir "\pic"
+  if !FileExist(picSrc)
+  {
+    FileCreateDir, % A_ScriptDir "\pic"
+  }
+  imgType := 3
+  Loop{
+    if(imgType > 10){
+      Break
+    }
+    src := % A_ScriptDir "\pic\" imgType ".png"
+    if !FileExist(src)
+    {
+      url := % "https://gitee.com/hhzxxx/static4-me/raw/master/pic/poeUtil/" imgType ".png"
+      UrlDownloadToFile, % url, % src
+    }
+    imgType += 1
+  }
+
 }
 
 ConfigSet(key,value,SectionName := "Config"){
