@@ -3,6 +3,8 @@ SendMode Input
 SetWorkingDir, %A_ScriptDir%
 #Persistent
 
+#include %A_ScriptDir%\jietu.ahk 
+
 global DefaultGui := ""
 global NowSection := ""
 global xpos:= 0
@@ -13,7 +15,7 @@ global getPosType:= 0
 #include %A_ScriptDir%\work.ahk
 #include %A_ScriptDir%\DoWork.ahk
 
-Gui, Add, Tab3,, General|Settings
+Gui, Add, Tab3,, 做装|设置|标价
 
 Gui, Tab, 1 
 Gui, Add, CheckBox, vTuiBian, 蜕变
@@ -68,6 +70,12 @@ Gui, Add, Edit, ys+60 x+10 vFuHaoXY w60 +ReadOnly
 Gui, Add, Edit, vHunDunXY w60 y+10 +ReadOnly 
 Gui, Add, Edit, vChongZhuXY w60 y+10 +ReadOnly 
 Gui, Add, Edit, vJiHuiXY w60 y+10 +ReadOnly 
+
+Gui, Tab, 3
+Gui, Add, Picture,  vMyPic ,% A_ScriptDir "\pic\333.png"
+Gui, Add, Edit, vValue w180 Limit50 xs+10 y+180, 
+Gui, Add, Button, Default w100 gAddItemPic xs+10 y+20, 添加物品
+
 Gui, Tab, 
 Gui, Add, Button, Default w80 , OK 
 Gui, Add, Button, Default w80 x+100 , Reload
@@ -114,6 +122,8 @@ ButtonSave:
   }
 return
 
+
+
 ButtonLoad:
   ListViewAdd()
 return
@@ -139,6 +149,36 @@ ListViewAdd(){
   LV_ModifyCol(6,60) ; 根据内容自动调整每列的大小.
   Gui, MyGui:Show
 }
+
+
+AddItemPic:
+Hotkey, Lbutton, jietuLabel
+Hotkey, Lbutton, jietuLabel,On
+Return
+
+jietuLabel:
+try {
+  SCW_ScreenClip2Win(0) ; set to 1 to auto-copy to clipboard
+  WinActivate, ScreenClippingWindow ahk_class AutoHotkeyGUI
+  IfWinActive,  ScreenClippingWindow ahk_class AutoHotkeyGUI
+  {
+    SCW_Win2FileNoFrom()
+  }
+  Hotkey, Lbutton, jietuLabel,Off
+  src := % A_ScriptDir "\pic\Capture.png"
+  Gui, %DefaultGui%:Default
+  GuiControl,, MyPic, *w200 *h200 %src%
+} catch e {
+  Hotkey, Lbutton, jietuLabel,Off
+  IfWinActive,  ScreenClippingWindow ahk_class AutoHotkeyGUI
+    winclose, A
+  MsgBox, error
+}
+  IfWinActive,  ScreenClippingWindow ahk_class AutoHotkeyGUI
+    winclose, A
+
+return
+
 
 MyListView:
   if (A_GuiEvent = "DoubleClick")
