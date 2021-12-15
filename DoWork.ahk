@@ -227,7 +227,7 @@ match(){
   }
   For index, value in matchStrList
   {    
-    ; MsgBox, % value
+    ; MsgBox, % Haystack
     if(RegExMatch(Haystack, value)){
       
       addGotFixNum(fixTypeList[index])
