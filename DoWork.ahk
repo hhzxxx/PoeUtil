@@ -95,10 +95,10 @@ Use(type){
 
 initItemXy(){
   WinActivate,Path of Exile
-  if(itemX = 0 or itemY = 0){
+  if(!itemX or !itemY){
     itemX = % Ceil((ConfigGet("LTopX")+ConfigGet("RBottomX")+30)/2)
     itemY = % Ceil((ConfigGet("LTopY")+ConfigGet("RBottomY")+50)/2)
-    ; MsgBox, %itemX% %itemY% 
+    
     MouseMove ,%itemX% ,%itemY% 
   }
 }
@@ -207,9 +207,9 @@ genItemList(){
 
 match(){
   MouseMove, %itemX%,%itemY% 
-  Sleep, 30
+  Sleep, 50
   send ^!C
-  Sleep, 30
+  Sleep, 50
   Haystack:= Clipboard
   matchCount := 0
   matchRes :=""
