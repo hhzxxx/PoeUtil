@@ -232,10 +232,13 @@ SCW_ScreenClip2Win(clip=0) {
    GuiNum := StartAfter + c
    Area := SCW_SelectAreaMod("g" GuiNum " c" SelColor " t" SelTrans)
    StringSplit, v, Area, |
-;    MsgBox, % v3 " " v4
+;    MsgBox, % v3 " " v4 " " Area
    if (v3 < 10 and v4 < 10)   ; too small area
-   return
+   return 0
 
+   if(v3 > 120 or v4 > 120)
+   return 0
+   
    pToken := Gdip_Startup()
    if pToken =
    {
@@ -260,6 +263,7 @@ if clip=1
 ;~ MsgBox on clipboard
 ;*******************************************************
 }
+return Area
 }
 
 SCW_SelectAreaMod(Options="") {
@@ -282,22 +286,36 @@ SCW_SelectAreaMod(Options="") {
    WinSet, Transparent, %t%
    Gui %g%: Color, %c%
    Hotkey := RegExReplace(A_ThisHotkey,"^(\w* & |\W*)")
+   lastX:=0
+   lastY:=0
+   lastW:=0
+   lastH:=0
    While, (GetKeyState(Hotkey, "p"))
    {
       Sleep, 10
       MouseGetPos, MXend, MYend
       w := abs(MX - MXend), h := abs(MY - MYend)
-      X := (MX < MXend) ? MX : MXend
-      Y := (MY < MYend) ? MY : MYend
-      Gui %g%: Show, x%X% y%Y% w%w% h%h% NA
+	  if(w<110 and h<110){
+		lastX = %MXend%
+		lastY = %MYend%
+		lastW = %w%
+		lastH = %h%
+		X := (MX < MXend) ? MX : MXend
+		Y := (MY < MYend) ? MY : MYend
+		Gui %g%: Show, x%X% y%Y% w%w% h%h% NA
+	  }
+	  
    }
+   MXend := %lastX%
+   MYend := %lastY%
+   w := %lastW%
+   h := %lastH%
    Try Gui %g%: Destroy
-   MouseGetPos, MXend, MYend
-   If ( MX > MXend )
-   temp := MX, MX := MXend, MXend := temp
-   If ( MY > MYend )
-   temp := MY, MY := MYend, MYend := temp
-   Return MX "|" MY "|" w "|" h
+   If ( MX > lastX )
+   temp := MX, MX := lastX, lastX := temp
+   If ( MY > lastY )
+   temp := MY, MY := lastY, lastY := temp
+   Return MX "|" MY "|" lastW "|" lastH
 }
 
 
@@ -452,7 +470,7 @@ SCW_Win2File(KeepBorders=0, Email=0, FromMenu=0) {
    return FilePath
 }
 
-SCW_Win2FileNoFrom(KeepBorders=0) {
+SCW_Win2FileNoFrom(KeepBorders=0 ,myFileName= "Capture") {
 	Sleep 300 ;sleep to wait till menu fully disappears
    Send, !{PrintScreen} ; Active Win's client area to Clipboard
    sleep 50
@@ -465,8 +483,6 @@ SCW_Win2FileNoFrom(KeepBorders=0) {
       pBitmap2 := SCW_CropImage(pBitmap, 3, 3, w-6, h-6)
    }
    
-	myFileName := "Capture"      
-		
 	; FileCreateDir,% A_Desktop . "\pic\"
    FilePath:=A_ScriptDir . "\pic\" . myFileName . ".PNG" ;path to file to save
   

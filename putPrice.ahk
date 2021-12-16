@@ -1,20 +1,18 @@
 ﻿#SingleInstance, Force
 SendMode Input
 SetWorkingDir, %A_ScriptDir%
-global LTopX:=58
-global LTopY:=355
-global RBottomX:=999
-global RBottomY:=999
 global failcount := 0
 #RButton::
-dianji()
+putPrice()
 return
 
-dianji(){
-  
+putPrice(price = 0){
   sleep 200
   if(failcount > 3){
-    Reload
+    failcount = 0
+    ToolTip, 完成
+    SetTimer, RemoveToolTip, -3000
+    return
   }
   WinActivate, Path of Exile
   src := % A_ScriptDir "\pic\333.png"
@@ -22,16 +20,16 @@ dianji(){
   if (ErrorLevel = 2)
   {
     failcount += 1
-    dianji()
+    putPrice()
   }
   else if (ErrorLevel = 1)
   {
     failcount += 1
-    dianji()
+    putPrice()
   }
   else{
     Click, %FoundX% %FoundY%,Right
-    biaojia(5)
+    biaojia(price)
   }
 }
 
@@ -59,5 +57,5 @@ queding(){
     MsgBox % LTopX LTopY RBottomX RBottomY src
   else
     Click, %FoundX% %FoundY%
-    dianji()
+    putPrice()
 }

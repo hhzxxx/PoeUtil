@@ -55,6 +55,9 @@ InitConfig(){
     if(ConfigGet("JiHuiX") and ConfigGet("JiHuiY")){
       GuiControl,, JiHuiXY , % ConfigGet("JiHuiX") " " ConfigGet("JiHuiY")
     }
+    if(ConfigGet("GaoDianJinX") and ConfigGet("GaoDianJinY")){
+      GuiControl,, GaoDianJinXY , % ConfigGet("GaoDianJinX") " " ConfigGet("GaoDianJinY")
+    }
   }Else{
     FileAppend,, %A_ScriptDir%\config.ini,UTF-8
     ConfigSet("AlwaysOnTopFlag",0)

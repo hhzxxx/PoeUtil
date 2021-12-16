@@ -2,8 +2,8 @@
 SendMode Input
 SetWorkingDir, %A_ScriptDir%
 #Persistent
-
 #include %A_ScriptDir%\jietu.ahk 
+
 
 global DefaultGui := ""
 global NowSection := ""
@@ -12,22 +12,22 @@ global ypos:= 0
 global getPosType:= 0
 
 #include %A_ScriptDir%\init.ahk
-#include %A_ScriptDir%\work.ahk
-#include %A_ScriptDir%\DoWork.ahk
+
 
 Gui, Add, Tab3,, 做装|设置|标价
 
 Gui, Tab, 1 
 Gui, Add, CheckBox, vTuiBian, 蜕变
 Gui, Add, CheckBox, vGaiZao, 改造
-Gui, Add, CheckBox, vZengFu ys+30 x+10, 增幅
+Gui, Add, CheckBox, vZengFu ys+30 x+1, 增幅
 Gui, Add, CheckBox, vFuHao , 富豪
-Gui, Add, CheckBox, vChongZhu ys+30 x+10, 重铸
+Gui, Add, CheckBox, vChongZhu ys+30 x+1, 重铸
 Gui, Add, CheckBox, vDianJin, 点金
-Gui, Add, CheckBox, vHunDun ys+30 x+10, 混沌
+Gui, Add, CheckBox, vHunDun ys+30 x+1, 混沌
 Gui, Add, CheckBox, vJiHui , 机会
+Gui, Add, CheckBox, vGaoDianJin ys+30 x+1, 高阶
 
-Gui, Add, Text,xs+10 y+15 , 至少:
+Gui, Add, Text,xs+10 y+25 , 至少:
 Gui, Add, Edit,x+20 ReadOnly w60
 Gui, Add, UpDown, vMin Range1-4 , 1
 Gui, Add, Button, Default w40 x+20 , Save
@@ -40,7 +40,7 @@ Gui, Add, Edit, vName4 w180 Limit50 xs+10 y+6,
 Gui, Add, Edit, vName5 w180 Limit50 xs+10 y+6, 
 Gui, Add, Edit, vName6 w180 Limit50 xs+10 y+6, 
 
-Gui, Add, DropDownList, vName1Type w55 ys+120 x+5 AltSubmit, 任意||前缀|后缀|必须
+Gui, Add, DropDownList, vName1Type w55 ys+110 x+5 AltSubmit, 任意||前缀|后缀|必须
 Gui, Add, DropDownList, vName2Type w55 y+10 AltSubmit, 任意||前缀|后缀|必须
 Gui, Add, DropDownList, vName3Type w55 y+10 AltSubmit, 任意||前缀|后缀|必须
 Gui, Add, DropDownList, vName4Type w55 y+10 AltSubmit, 任意||前缀|后缀|必须
@@ -55,26 +55,33 @@ Gui, Add, Button, Default w50 gDianJinPos, 点金
 Gui, Add, Button, Default w50 gTuiBianPos, 蜕变
 Gui, Add, Button, Default w50 gGaiZaoPos, 改造
 Gui, Add, Button, Default w50 gZengFuPos, 增幅
-Gui, Add, Edit, ys+60 x+10 vLeftTopXY w60 +ReadOnly
+Gui, Add, Edit, ys+55 x+10 vLeftTopXY w60 +ReadOnly
 Gui, Add, Edit, vRightBottomXY w60 y+10 +ReadOnly 
 Gui, Add, Edit, vDianJinXY w60 y+10 +ReadOnly 
 Gui, Add, Edit, vTuiBianXY w60 y+10 +ReadOnly
 Gui, Add, Edit, vGaiZaoXY w60 y+10 +ReadOnly
 Gui, Add, Edit, vZengFuXY w60 y+10 +ReadOnly
 
-Gui, Add, Button, Default w50 gFuHaoPos ys+60 x+10, 富豪 
+Gui, Add, Button, Default w50 gFuHaoPos ys+55 x+10, 富豪 
 Gui, Add, Button, Default w50 gHunDunPos, 混沌 
 Gui, Add, Button, Default w50 gChongZhuPos, 重铸
 Gui, Add, Button, Default w50 gJiHuiPos, 机会
-Gui, Add, Edit, ys+60 x+10 vFuHaoXY w60 +ReadOnly
+Gui, Add, Button, Default w50 gGaoDianJinPos, 高阶点金
+Gui, Add, Edit, ys+55 x+10 vFuHaoXY w60 +ReadOnly
 Gui, Add, Edit, vHunDunXY w60 y+10 +ReadOnly 
 Gui, Add, Edit, vChongZhuXY w60 y+10 +ReadOnly 
 Gui, Add, Edit, vJiHuiXY w60 y+10 +ReadOnly 
+Gui, Add, Edit, vGaoDianJinXY w60 y+10 +ReadOnly 
+
+Gui, Add, Button, Default w100 gPosSet xs+10 y+80, 设置
 
 Gui, Tab, 3
-Gui, Add, Picture,  vMyPic ,% A_ScriptDir "\pic\333.png"
-Gui, Add, Edit, vValue w180 Limit50 xs+10 y+180, 
+Gui, Add, Picture,  vMyPic ,
+Gui, Add, Edit, vPrice w180 Limit50 xs+10 y+180, 
 Gui, Add, Button, Default w100 gAddItemPic xs+10 y+20, 添加物品
+Gui, Add, Button, Default w100 gPutItemPic x+10, 开始标价
+Gui, Add, Button, Default w100 gTestPrice xs+10 y+20, 测试价格
+Gui, Add, Button, Default w100 gTestSubmit x+10, 测试按钮
 
 Gui, Tab, 
 Gui, Add, Button, Default w80 , OK 
@@ -156,26 +163,53 @@ Hotkey, Lbutton, jietuLabel
 Hotkey, Lbutton, jietuLabel,On
 Return
 
+PutItemPic:
+GuiControlGet, Price
+if(itemSrc and Price){
+  ToolTip, start
+  putPrice(Price)
+}
+return
+
+TestPrice:
+GuiControlGet, Price
+if(Price){
+putPrice(Price)
+}
+
+return
+
+TestSubmit:
+
+return
+
 jietuLabel:
 try {
-  SCW_ScreenClip2Win(0) ; set to 1 to auto-copy to clipboard
-  WinActivate, ScreenClippingWindow ahk_class AutoHotkeyGUI
-  IfWinActive,  ScreenClippingWindow ahk_class AutoHotkeyGUI
-  {
-    SCW_Win2FileNoFrom()
+  flag := SCW_ScreenClip2Win(0) ; set to 1 to auto-copy to clipboard
+  if(flag != 0){
+    WinActivate, ScreenClippingWindow ahk_class AutoHotkeyGUI
+    IfWinActive,  ScreenClippingWindow ahk_class AutoHotkeyGUI
+    {
+      SCW_Win2FileNoFrom(0)
+    }
+    Hotkey, Lbutton, jietuLabel,Off
+    src := % A_ScriptDir "\pic\Capture.png"
+    global itemSrc := % src
+    Gui, %DefaultGui%:Default
+    GuiControl,, MyPic, *w300 *h-1 %src%
+  }else{
+    Hotkey, Lbutton, jietuLabel,Off
+    MsgBox, 区域太大或太小
   }
-  Hotkey, Lbutton, jietuLabel,Off
-  src := % A_ScriptDir "\pic\Capture.png"
-  Gui, %DefaultGui%:Default
-  GuiControl,, MyPic, *w200 *h200 %src%
 } catch e {
   Hotkey, Lbutton, jietuLabel,Off
   IfWinActive,  ScreenClippingWindow ahk_class AutoHotkeyGUI
     winclose, A
   MsgBox, error
 }
-  IfWinActive,  ScreenClippingWindow ahk_class AutoHotkeyGUI
-    winclose, A
+Hotkey, Lbutton, jietuLabel,Off
+IfWinActive,  ScreenClippingWindow ahk_class AutoHotkeyGUI
+  winclose, A
 
 return
 
@@ -206,6 +240,134 @@ MyListView:
   }
 
 return
+
+PosSet:
+  Try Gui SetGui: Destroy
+  Try Gui SetGui: +AlwaysOnTop  +Border -ToolWindow +LastFound -DPIScale +Resize
+  Gui SetGui: Show, x100 y50 w900 h50 NA
+  Gui, SetGui:Add, Button, Default w100 gSelectArea, 选择区域
+  Gui, SetGui:Add, Button, Default y12 w50 gSelect3, 点金
+  Gui, SetGui:Add, Button, Default y12 w50 gSelect4, 蜕变
+  Gui, SetGui:Add, Button, Default y12 w50 gSelect5, 改造
+  Gui, SetGui:Add, Button, Default y12 w50 gSelect6, 增幅
+  Gui, SetGui:Add, Button, Default y12 w50 gSelect7, 富豪
+  Gui, SetGui:Add, Button, Default y12 w50 gSelect8, 混沌
+  Gui, SetGui:Add, Button, Default y12 w50 gSelect9, 重铸
+  Gui, SetGui:Add, Button, Default y12 w50 gSelect10, 机会
+  Gui, SetGui:Add, Button, Default y12 w100 gSelect11, 高阶点金  
+return
+
+SelectArea:
+Hotkey, Lbutton, SelectAreaLabel,On
+Hotkey, Rbutton, CancleSelectAreaLabel,On
+ToolTip,左键点击选择区域，右键取消
+return
+
+Select3:
+StartGetPos(3)
+Hotkey, Rbutton, CancleSelectAreaLabel,On
+ToolTip,左键双击选择坐标，右键取消 
+return
+
+Select4:
+StartGetPos(4)
+Hotkey, Rbutton, CancleSelectAreaLabel,On
+ToolTip,左键双击选择坐标，右键取消 
+return
+
+Select5:
+StartGetPos(5)
+Hotkey, Rbutton, CancleSelectAreaLabel,On
+ToolTip,左键双击选择坐标，右键取消 
+return
+
+Select6:
+StartGetPos(6)
+Hotkey, Rbutton, CancleSelectAreaLabel,On
+ToolTip,左键双击选择坐标，右键取消 
+return
+
+Select7:
+StartGetPos(7)
+Hotkey, Rbutton, CancleSelectAreaLabel,On
+ToolTip,左键双击选择坐标，右键取消 
+return
+
+Select8:
+StartGetPos(8)
+Hotkey, Rbutton, CancleSelectAreaLabel,On
+ToolTip,左键双击选择坐标，右键取消 
+return
+
+Select9:
+StartGetPos(9)
+Hotkey, Rbutton, CancleSelectAreaLabel,On
+ToolTip,左键双击选择坐标，右键取消 
+return
+
+Select10:
+StartGetPos(10)
+Hotkey, Rbutton, CancleSelectAreaLabel,On
+ToolTip,左键双击选择坐标，右键取消 
+return
+
+Select11:
+StartGetPos(11)
+Hotkey, Rbutton, CancleSelectAreaLabel,On
+ToolTip,左键双击选择坐标，右键取消 
+return
+
+CancleSelectAreaLabel:
+ToolTip
+Hotkey, ~LButton , off
+Hotkey, Lbutton, SelectAreaLabel,Off
+Hotkey, Rbutton, CancleSelectAreaLabel,Off
+return
+
+SelectAreaLabel:
+  ToolTip
+  MouseGetPos, , , id, control
+  WinActivate, ahk_id %id%
+  MouseGetPos, MX, MY
+  c := "Blue"
+  t := "50"
+  g := "99" 
+  Try Gui %g%: Destroy
+  Try Gui %g%: +AlwaysOnTop -caption +Border +ToolWindow +LastFound -DPIScale ;provided from rommmcek 10/23/16
+
+  WinSet, Transparent, %t%
+  Gui %g%: Color, %c%
+  Hotkey := RegExReplace(A_ThisHotkey,"^(\w* & |\W*)")
+  While, (GetKeyState(Hotkey, "p"))
+  {
+    MouseGetPos, MXend, MYend
+    w := abs(MX - MXend), h := abs(MY - MYend)
+    X := (MX < MXend) ? MX : MXend
+    Y := (MY < MYend) ? MY : MYend
+    Gui %g%: Show, x%X% y%Y% w%w% h%h% NA
+    Sleep, 10
+  }
+  MouseGetPos, MXend, MYend
+  If ( MX > MXend )
+  temp := MX, MX := MXend, MXend := temp
+  If ( MY > MYend )
+  temp := MY, MY := MYend, MYend := temp
+
+  Hotkey, Lbutton, SelectAreaLabel,Off
+  Hotkey, Rbutton, CancleSelectAreaLabel,Off
+  MsgBox, 4100 , ,% "确认?"
+  Try Gui %g%: Destroy
+  IfMsgBox No
+  {
+    Hotkey, Lbutton, SelectAreaLabel,On
+    Hotkey, Rbutton, CancleSelectAreaLabel,On
+  }Else{
+    Gui, %DefaultGui%:Default
+    SavePos(MX,MY,1)
+    SavePos(MXend,MYend,2)
+  }
+return
+
 
 LeftTop:
   StartGetPos(1)
@@ -247,7 +409,11 @@ JiHuiPos:
   ImgSearch(10)
 return
 
+GaoDianJinPos:
+  ImgSearch(11)
+return
 StartGetPos(type){
+  try Hotkey, ~LButton , off
   ToolTip, 开始获取
   getPosType = %type%
   gnPressCount := 0
@@ -299,11 +465,12 @@ ProcSubroutine:
       ; 第二类行为
       MouseGetPos, xpos, ypos,id, control
       WinGetTitle, title, ahk_id %id%
-      if(title = "Path of Exile"){
+      ; if(title = "Path of Exile"){
+        ToolTip
         Hotkey, ~LButton , off
         Gui, %DefaultGui%:Default
         SavePos(xpos,ypos,getPosType)
-      }
+      ; }
     }Else
     {
       ;MsgBox, 触发三击鼠标右键事件
@@ -313,7 +480,7 @@ ProcSubroutine:
     Return
   }
 
-#F1::
+F1::
   Gui, Submit,NoHide
   SetTimer, TimerWork, Off
 return
@@ -326,6 +493,7 @@ TimerWork:
       res := Use(type)
       if(res != 0){
         ToolTip, success
+        SetTimer, RemoveToolTip,-1000
         SetTimer, TimerWork, Off
       }
     }Else{
@@ -339,3 +507,13 @@ return
 SBSetText(text){
   SB_SetText("    " . text . "")
 }
+
+RemoveToolTip:
+ToolTip
+return
+
+#include %A_ScriptDir%\work.ahk
+#include %A_ScriptDir%\DoWork.ahk
+#include %A_ScriptDir%\putPrice.ahk
+
+

@@ -25,6 +25,7 @@ DoSave(sectionName){
   GuiControlGet, DianJin
   GuiControlGet, HunDun
   GuiControlGet, JiHui
+  GuiControlGet, GaoDianJin
   ConfigSet("Min",Min,sectionName)
   ConfigSet("Name1",Name1,sectionName)
   ConfigSet("Name2",Name2,sectionName)
@@ -44,6 +45,7 @@ DoSave(sectionName){
   ConfigSet("FuHao",FuHao,sectionName)
   ConfigSet("ChongZhu",ChongZhu,sectionName)
   ConfigSet("DianJin",DianJin,sectionName)
+  ConfigSet("GaoDianJin",GaoDianJin,sectionName)
   ConfigSet("HunDun",HunDun,sectionName)
   ConfigSet("JiHui",JiHui,sectionName)
 }
@@ -74,6 +76,7 @@ LoadData(RowText,DefaultGui){
   GuiControl,, DianJin , % ConfigGet("DianJin",RowText)
   GuiControl,, HunDun , % ConfigGet("HunDun",RowText)
   GuiControl,, JiHui , % ConfigGet("JiHui",RowText)
+  GuiControl,, GaoDianJin , % ConfigGet("GaoDianJin",RowText)
 }
 
 ImgSearch(type){
@@ -144,6 +147,11 @@ SavePos(xpos,ypos,type){
     ConfigSet("JiHuiX",xpos)
     ConfigSet("JiHuiY",ypos)
     GuiControl,, JiHuiXY , % xpos " " ypos
+  }
+  if(type = 11){ ;高阶点金 
+    ConfigSet("GaoDianJinX",xpos)
+    ConfigSet("GaoDianJinY",ypos)
+    GuiControl,, GaoDianJinXY , % xpos " " ypos
   }
   WinActivate,PoeUtil
 }
