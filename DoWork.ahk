@@ -22,6 +22,7 @@ global nowPrefix := 0
 global nowSuffix := 0
 global addNum := 0  ;富豪 增幅数量
 global allowChongZhu := 0
+global allowTuiBian := 0
 
 StartWork(){
   global itemList := []
@@ -41,6 +42,7 @@ StartWork(){
   global nowSuffix := 0
   global addNum := 0  ;富豪 增幅数量
   global allowChongZhu := 0
+  global allowTuiBian := 0
   genItemList()
   return
 }
@@ -53,16 +55,26 @@ Use(type){
     if(nowSuffix = 1 and nowPrefix = 1){
       return 0
     }
-    if(nowPrefix = 0 and nowSuffix = 1 and (prefix>0 or anyfix>0)){
-      a = 1
-    }else if(nowSuffix = 0 and nowPrefix = 1 and (suffix>0 or anyfix>0)){
-      a = 2
-    }else if(nowPrefix = 0 and nowSuffix = 1 and suffix>0 and anyfix=0){
-      return 0
-    }else if(nowSuffix = 0 and nowPrefix = 1 and prefix>0 and anyfix=0){
-      return 0
-    }else if((fixMin - oldMatch)> addNum or (nowSuffix = 1 and nowPrefix = 1)){
-      return 0
+    if(suffix>0 and prefix>0){
+      if(gotPrefix >0 and nowSuffix = 0){
+        a = 1
+      }Else if(gotSuffix >0 and nowPrefix = 0){
+        a = 1
+      }Else{
+        return 0
+      }
+    }Else{
+      if(nowPrefix = 0 and nowSuffix = 1 and (prefix>0 or anyfix>0)){
+        a = 1
+      }else if(nowSuffix = 0 and nowPrefix = 1 and (suffix>0 or anyfix>0)){
+        a = 2
+      }else if(nowPrefix = 0 and nowSuffix = 1 and suffix>0 and anyfix=0){
+        return 0
+      }else if(nowSuffix = 0 and nowPrefix = 1 and prefix>0 and anyfix=0){
+        return 0
+      }else if((fixMin - oldMatch)> addNum or (nowSuffix = 1 and nowPrefix = 1)){
+        return 0
+      }
     }
   }
   if(oldMatch != (fixMin-1) and type = 7){
@@ -70,6 +82,15 @@ Use(type){
   }
   if(allowChongZhu = 0 and type = 9){
     return 0
+  }
+  if(type = 9){
+    global allowTuiBian := 1
+  }
+  if(allowTuiBian = 0 and type = 4){
+    return 0
+  }
+  if(type = 4){
+    global allowTuiBian := 0
   }
   initItemXy()
   typeList:=["","","DianJin","TuiBian","GaiZao","ZengFu","FuHao","HunDun","ChongZhu","JiHui"]
@@ -96,8 +117,8 @@ Use(type){
 initItemXy(){
   WinActivate,Path of Exile
   if(!itemX or !itemY){
-    itemX = % Ceil((ConfigGet("LTopX")+ConfigGet("RBottomX")+30)/2)
-    itemY = % Ceil((ConfigGet("LTopY")+ConfigGet("RBottomY")+50)/2)
+    itemX = % ConfigGet("ItemBoxX")
+    itemY = % ConfigGet("ItemBoxY")
     
     MouseMove ,%itemX% ,%itemY% 
   }
@@ -209,7 +230,7 @@ match(){
   MouseMove, %itemX%,%itemY% 
   Sleep, 50
   send ^!C
-  Sleep, 50
+  Sleep, 100
   Haystack:= Clipboard
   matchCount := 0
   matchRes :=""

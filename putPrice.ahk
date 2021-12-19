@@ -15,7 +15,7 @@ putPrice(price = 0){
     return
   }
   WinActivate, Path of Exile
-  src := % A_ScriptDir "\pic\333.png"
+  src := % A_ScriptDir "\pic\Capture.png"
   ImageSearch, FoundX, FoundY, % LTopX, % LTopY, % RBottomX, % RBottomY,*30 %src%
   if (ErrorLevel = 2)
   {
@@ -44,7 +44,10 @@ biaojia(value){
   else
     Click, %FoundX% %FoundY%
     Send, %value%
-    queding()
+    Sleep, 50
+    Send, {Enter}
+    putPrice(value)
+    ; queding()
 }
 
 queding(){

@@ -58,6 +58,8 @@ InitConfig(){
     if(ConfigGet("GaoDianJinX") and ConfigGet("GaoDianJinY")){
       GuiControl,, GaoDianJinXY , % ConfigGet("GaoDianJinX") " " ConfigGet("GaoDianJinY")
     }
+    src := % A_ScriptDir "\pic\Capture.png"
+    GuiControl,, MyPic, *w120 *h-1 %src%
   }Else{
     FileAppend,, %A_ScriptDir%\config.ini,UTF-8
     ConfigSet("AlwaysOnTopFlag",0)

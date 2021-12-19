@@ -157,30 +157,32 @@ ListViewAdd(){
   Gui, MyGui:Show
 }
 
+global myFileName := "Capture"
 
 AddItemPic:
+myFileName := "Capture"
 Hotkey, Lbutton, jietuLabel
 Hotkey, Lbutton, jietuLabel,On
 Return
 
 PutItemPic:
 GuiControlGet, Price
-if(itemSrc and Price){
+if(Price){
   ToolTip, start
   putPrice(Price)
 }
 return
 
 TestPrice:
-GuiControlGet, Price
-if(Price){
-putPrice(Price)
-}
-
+myFileName := "111"
+Hotkey, Lbutton, jietuLabel
+Hotkey, Lbutton, jietuLabel,On
 return
 
 TestSubmit:
-
+myFileName := "222"
+Hotkey, Lbutton, jietuLabel
+Hotkey, Lbutton, jietuLabel,On
 return
 
 jietuLabel:
@@ -190,13 +192,15 @@ try {
     WinActivate, ScreenClippingWindow ahk_class AutoHotkeyGUI
     IfWinActive,  ScreenClippingWindow ahk_class AutoHotkeyGUI
     {
-      SCW_Win2FileNoFrom(0)
+      SCW_Win2FileNoFrom(0,myFileName)
     }
     Hotkey, Lbutton, jietuLabel,Off
-    src := % A_ScriptDir "\pic\Capture.png"
-    global itemSrc := % src
     Gui, %DefaultGui%:Default
-    GuiControl,, MyPic, *w300 *h-1 %src%
+    if(myFileName = "Capture"){
+      src := % A_ScriptDir "\pic\Capture.png"
+      global itemSrc := % src
+      GuiControl,, MyPic, *w120 *h-1 %src%
+    }
   }else{
     Hotkey, Lbutton, jietuLabel,Off
     MsgBox, 区域太大或太小
@@ -246,6 +250,7 @@ PosSet:
   Try Gui SetGui: +AlwaysOnTop  +Border -ToolWindow +LastFound -DPIScale +Resize
   Gui SetGui: Show, x100 y50 w900 h50 NA
   Gui, SetGui:Add, Button, Default w100 gSelectArea, 选择区域
+  Gui, SetGui:Add, Button, Default y12 w75 gItemBox, 物品框  
   Gui, SetGui:Add, Button, Default y12 w50 gSelect3, 点金
   Gui, SetGui:Add, Button, Default y12 w50 gSelect4, 蜕变
   Gui, SetGui:Add, Button, Default y12 w50 gSelect5, 改造
@@ -261,6 +266,12 @@ SelectArea:
 Hotkey, Lbutton, SelectAreaLabel,On
 Hotkey, Rbutton, CancleSelectAreaLabel,On
 ToolTip,左键点击选择区域，右键取消
+return
+
+ItemBox:
+StartGetPos(666)
+Hotkey, Rbutton, CancleSelectAreaLabel,On
+ToolTip,左键双击选择坐标，右键取消 
 return
 
 Select3:

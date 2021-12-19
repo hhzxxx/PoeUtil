@@ -108,6 +108,11 @@ SavePos(xpos,ypos,type){
     global RBottomY = % ypos
     GuiControl,, RightBottomXY , % xpos " " ypos
   }
+  if(type = 666){ ;物品框
+    ConfigSet("ItemBoxX",xpos)
+    ConfigSet("ItemBoxY",ypos)
+    ; GuiControl,, DianJinXY , % xpos " " ypos
+  }
   if(type = 3){ ;点金
     ConfigSet("DianJinX",xpos)
     ConfigSet("DianJinY",ypos)
