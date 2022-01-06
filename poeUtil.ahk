@@ -14,7 +14,7 @@ global getPosType:= 0
 #include %A_ScriptDir%\init.ahk
 
 
-Gui, Add, Tab3,, 做装|设置|标价
+Gui, Add, Tab3,, 做装|设置|吃药|标价|导航
 
 Gui, Tab, 1 
 Gui, Add, CheckBox, vTuiBian, 蜕变
@@ -75,13 +75,21 @@ Gui, Add, Edit, vGaoDianJinXY w60 y+10 +ReadOnly
 
 Gui, Add, Button, Default w100 gPosSet xs+10 y+80, 设置
 
-Gui, Tab, 3
+Gui, Tab, 4
 Gui, Add, Picture,  vMyPic ,
 Gui, Add, Edit, vPrice w180 Limit50 xs+10 y+180, 
 Gui, Add, Button, Default w100 gAddItemPic xs+10 y+20, 添加物品
 Gui, Add, Button, Default w100 gPutItemPic x+10, 开始标价
 Gui, Add, Button, Default w100 gTestPrice xs+10 y+20, 测试价格
 Gui, Add, Button, Default w100 gTestSubmit x+10, 测试按钮
+
+Gui, Tab, 5
+Gui, Add, Button, Default w100 gAct1, ACT1
+Gui, Add, Button, Default w100 gAct2, ACT2
+Gui, Add, Button, Default w100 gAct3, ACT3
+Gui, Add, Button, Default w100 gAct4, ACT4
+Gui, Add, Button, Default w100 gAct5, ACT5
+Gui, Add, Button, Default w100 gDestoryAct, 关闭
 
 Gui, Tab, 
 Gui, Add, Button, Default w80 , OK 
@@ -523,6 +531,7 @@ RemoveToolTip:
 ToolTip
 return
 
+#include %A_ScriptDir%\core\ActGuide.ahk 
 #include %A_ScriptDir%\work.ahk
 #include %A_ScriptDir%\DoWork.ahk
 #include %A_ScriptDir%\putPrice.ahk
