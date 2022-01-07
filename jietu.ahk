@@ -42,22 +42,6 @@ WM_RBUTTONDOWN()
     	winclose, A
 }
 
-OnMessage(0x0203, "WM_LBUTTONDBLCLK") ;double click to downsize. Double click again to resize.
-WM_LBUTTONDBLCLK() { 
-    
-   global
-    
-   WinGet, TempID, , A
-   WinGetPos, , , Temp_Width, Temp_Height, A 
-   
-   If (Temp_Width = 30 && Temp_Height = 30) {
-      WinMove, A, , , , % %TempID%_Width, % %TempID%_Height
-   } else {
-   %TempID%_Width := Temp_Width
-   %TempID%_Height := Temp_Height
-   WinMove, A, , , , 30, 30
-   }      
-}
 
 ;Hotkey to select area
 ; #Lbutton::

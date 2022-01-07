@@ -1,6 +1,9 @@
-﻿#SingleInstance
+﻿#SingleInstance, force
+#NoEnv 
 SendMode Input
 SetWorkingDir, %A_ScriptDir%
+OnExit("ExitFunc")
+OnMessage(0x0203, "WM_LBUTTONDBLCLK") ;double click to downsize. Double click again to resize.
 #Persistent
 #include %A_ScriptDir%\jietu.ahk 
 
@@ -14,7 +17,7 @@ global getPosType:= 0
 #include %A_ScriptDir%\init.ahk
 
 
-Gui, Add, Tab3,, 做装|设置|吃药|标价|导航
+Gui, Add, Tab3,gTabChange vTabName, 做装|设置|吃药|标价|导航|脚本
 
 Gui, Tab, 1 
 Gui, Add, CheckBox, vTuiBian, 蜕变
@@ -89,7 +92,17 @@ Gui, Add, Button, Default w100 gAct2, ACT2
 Gui, Add, Button, Default w100 gAct3, ACT3
 Gui, Add, Button, Default w100 gAct4, ACT4
 Gui, Add, Button, Default w100 gAct5, ACT5
+
+Gui, Add, Button, Default w100 gAct6 ys+30 x+1, ACT6
+Gui, Add, Button, Default w100 gAct7, ACT7
+Gui, Add, Button, Default w100 gAct8, ACT8
+Gui, Add, Button, Default w100 gAct9, ACT9
+Gui, Add, Button, Default w100 gAct10, ACT10
+Gui, Add, Edit, vShopText gShopTextEdit r6  w250 Limit100 xs+10 y+10, 
 Gui, Add, Button, Default w100 gDestoryAct, 关闭
+
+Gui, Tab, 6
+Gui, Add, ListView, r15 w250 vScriptListViewName gScriptListView Checked AltSubmit, 名称|状态
 
 Gui, Tab, 
 Gui, Add, Button, Default w80 , OK 
@@ -137,7 +150,12 @@ ButtonSave:
   }
 return
 
-
+TabChange:
+Gui, Submit, NoHide
+if(TabName = "脚本"){
+  initScriptList()
+}
+return
 
 ButtonLoad:
   ListViewAdd()
@@ -152,7 +170,7 @@ ListViewAdd(){
   IniRead, OutputVarSectionNames, %A_ScriptDir%\config.ini
   Array := StrSplit(OutputVarSectionNames , "`n")
   For index, value in Array
-  if(value != "Config"){
+  if(value != "Config" and value != "checkStatus" and value != "scriptList"){
     LV_Add("", value, ConfigGet("Min",value), ConfigGet("Name1",value), ConfigGet("Name2",value), ConfigGet("Name3",value), ConfigGet("Name4",value), ConfigGet("Name5",value), ConfigGet("Name6",value))
   }
 
@@ -532,8 +550,44 @@ ToolTip
 return
 
 #include %A_ScriptDir%\core\ActGuide.ahk 
+#include %A_ScriptDir%\core\ScriptListView.ahk 
 #include %A_ScriptDir%\work.ahk
 #include %A_ScriptDir%\DoWork.ahk
 #include %A_ScriptDir%\putPrice.ahk
 
 
+
+ExitFunc(ExitReason, ExitCode)
+{
+    if ExitReason in Reload
+    {
+        ; MsgBox, 4, , 123123t?
+        ; IfMsgBox, No
+        ;     return 1  ; OnExit 函数必须返回非零值来防止退出.
+    }else 
+    {
+        MsgBox, 4, , Are you sure you want to exit?
+        IfMsgBox, No
+            return 1  ; OnExit 函数必须返回非零值来防止退出.
+        closeScripts()
+    }
+    ; 不要调用 ExitApp -- 那会阻止其他 OnExit 函数被调用.
+}
+
+
+WM_LBUTTONDBLCLK() { 
+   global
+   WinGetTitle, title ,A
+   WinGet, TempID, , A
+   WinGetPos, , , Temp_Width, Temp_Height, A 
+  if(title = "poeUtil.ahk"){
+    clipboard := ConfigGet("ShopText")
+    If (Temp_Width = 80 && Temp_Height = 80) {
+        WinMove, A, , , , % %TempID%_Width, % %TempID%_Height
+    } else {
+    %TempID%_Width := Temp_Width
+    %TempID%_Height := Temp_Height
+    WinMove, A, , , , 80, 80
+    }  
+   }
+}

@@ -275,7 +275,7 @@ OnExitCleanup:
 {
 	CrossHair(true)
 	GuiClose:
-	ExitApp
+	; ExitApp
 }
 ShowStructure:
 {

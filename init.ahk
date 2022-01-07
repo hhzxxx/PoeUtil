@@ -58,8 +58,34 @@ InitConfig(){
     if(ConfigGet("GaoDianJinX") and ConfigGet("GaoDianJinY")){
       GuiControl,, GaoDianJinXY , % ConfigGet("GaoDianJinX") " " ConfigGet("GaoDianJinY")
     }
+    if(ConfigGet("ShopText")){
+      GuiControl,, ShopText , % ConfigGet("ShopText")
+      clipboard := ConfigGet("ShopText")
+    }
     src := % A_ScriptDir "\pic\Capture.png"
     GuiControl,, MyPic, *w120 *h-1 %src%
+
+    Loop, %A_ScriptDir%\scripts\*.*
+    {
+        checkStatus := ConfigGet(A_LoopFileName,"checkStatus")
+        if(checkStatus){
+            pid := ConfigGet(A_LoopFileName,"scriptList")
+            if(pid = 0){
+                Run, %A_ScriptDir%\scripts\%A_LoopFileName% ,,,outPid
+                if(outPid){
+                    ConfigSet(A_LoopFileName,outPid,"scriptList")
+                }
+            }Else{
+              Process, Exist , %pid%
+              if(ErrorLevel = 0){
+                Run, %A_ScriptDir%\scripts\%A_LoopFileName% ,,,outPid
+                if(outPid){
+                    ConfigSet(A_LoopFileName,outPid,"scriptList")
+                }
+              }
+            }
+        }
+    }
   }Else{
     FileAppend,, %A_ScriptDir%\config.ini,UTF-8
     ConfigSet("AlwaysOnTopFlag",0)
