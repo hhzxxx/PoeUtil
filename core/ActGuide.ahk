@@ -2,6 +2,8 @@
 SendMode Input
 SetWorkingDir, %A_ScriptDir%
 
+global ACTNUM := 1
+
 Act1:
   showActGuide(1)
 return
@@ -51,7 +53,12 @@ DestoryAct:
   DestroyActGuide()
 return
 
+CloseGuide:
+  DestroyActGuide()
+return
+
 showActGuide(number){
+  global ACTNUM := number
   FileRead, OutputVar, %A_ScriptDir%\txt\act%number%.txt
   Try Gui ActGuide: Destroy
   Try Gui ActGuide: +AlwaysOnTop -caption +Border +ToolWindow +LastFound +DPIScale ;provided from rommmcek 10/23/16
@@ -62,9 +69,27 @@ showActGuide(number){
 
 ;   Gui ActGuide:Add, StatusBar,, 
   Gui ActGuide:Add, Text, w500, %OutputVar%
-  Gui ActGuide: Show, x2000 y50 AutoSize NA
+  Gui, ActGuide:Add, Button, Default w80 xs+10 y+10 gGuide1, 前一章
+  Gui, ActGuide:Add, Button, Default w80 x+110 gCloseGuide, ACT %number%
+  Gui, ActGuide:Add, Button, Default w80 x+110 gGuide2, 后一章
+  
+  Gui ActGuide: Show, x0 y500 AutoSize NA
 
 }
+
+
+Guide1:
+  if(ACTNUM > 1){
+    showActGuide(ACTNUM - 1)
+  }
+return
+
+
+Guide2:
+  if(ACTNUM < 10){
+    showActGuide(ACTNUM + 1)
+  }
+return
 
 DestroyActGuide(){
   Try Gui ActGuide: Destroy

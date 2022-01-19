@@ -5,12 +5,13 @@
 v_Enable=0
 Thread, Interrupt, 0
 
+~q::
 ~RButton::
 If (v_Enable=1)
 {
 	Heyao()
-	Tick := 30
-	SetTimer, TimerLan, 100
+	; Tick := 20
+	; SetTimer, TimerLan, 100
 }
 Return
 
@@ -21,8 +22,8 @@ If (v_Enable=1)
 {
   ;send 5
 	Heyao()
-	Tick := 30
-	SetTimer, TimerLan, 100
+	; Tick := 30
+	; SetTimer, TimerLan, 100
 }
 Return
 
@@ -40,7 +41,7 @@ Else
 {
 Tooltip, start, 506, 1277,1
 ;MsgBox,,,开始,0.5
-SetTimer, Label0, 1
+ SetTimer, Label0, 1
 }
 Return
 
@@ -74,18 +75,18 @@ return
 
 Label0:
 if(inGame()){
-PixelGetColor, yy,  127,1203,Slow
+;PixelGetColor, yy,  127,1203,Slow
 if(yy != 0x2C2182) 
 {
 	;send 0
 }
-;PixelGetColor, xue, 157,1305  ,Slow  
-;145,1272
-;if(xue != 0x291CB6 and xue != 0x281AB3 and xue != 0x1D2898 and xue != 0x1E2998 ) 
-;{
-;	send 1
+PixelGetColor, xue, 157,1305  ,Slow  
+; 145,1272 157,1305 152,1250
+if(xue != 0x291CB6 and xue != 0x281AB3 and xue != 0x1D2898 and xue != 0x1E2998 and xue != 0x332EA7) 
+{
+	send 1
 	sleep 500
-;}
+}
 }
 
 return
@@ -110,9 +111,9 @@ return true
 
 Heyao()
 {
-	PixelGetColor, yao1, 420,1429,Slow 
+	;PixelGetColor, yao1, 420,1429,Slow 
 	if( yao1 = 0x000000 ){
-		send 1
+		 send 1
 	}else {
 
 	}
@@ -133,21 +134,21 @@ Heyao()
 		send 3
 	}else{
 	}
-	PixelGetColor, yao4, 605,1429,Slow
+	;PixelGetColor, yao4, 605,1429,Slow
 	if(yao4 = 0x050404  ){  
 		send 4
 	}else{
 	}
 	PixelGetColor, yao5, 665,1429,Slow
 	if(yao5 = 0x000000  ){  
-		send 5
+		 send 5
 	}else{
 	}
 }
 
 
 !F::
-PixelGetColor, OutputVar, 420,1429
+PixelGetColor, OutputVar, 152,1250
 clipboard := OutputVar
 Reload
 return

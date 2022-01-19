@@ -50,11 +50,16 @@ WinGetTitle, name, A
 If (name != "Path of Exile"){
 return
 }
+;Send {Space}
+;Send {i}
+;click,2611 820 right
+;Send {Space}
+;sleep 50
 	Send {Enter}
 	Send,{ShiftDown}{Home}{ShiftUp}{BackSpace}
 	SendActualText("/Exit")
 	Send {Enter}
-sleep 1800
+sleep 800
 Send {Enter}
 Return
 
@@ -62,6 +67,7 @@ Return
 SendActualText(text) { ;粘贴指定文本，并且恢复剪贴板
 	_temp := Clipboard
 	Clipboard = %text%
+  Sleep 100
 	Send ^v
 	Sleep 100
 	Clipboard = %_temp%
